@@ -53,12 +53,12 @@ contract ZDice {
     }
 
     function getMaxBet() public view returns (uint) {
-        uint maxBet = (address(this).balance - prevDividends - dividends) / 25;
+        uint maxBet = (address(this).balance - prevDividends - dividends + dividendsPaid) / 25;
         return maxBet > 10000000000 ? 10000000000 : maxBet;
     }
 
     function getProfit(uint amount) external onlyOwner {
-        uint max = address(this).balance - prevDividends - dividends;
+        uint max = address(this).balance - prevDividends - dividends + dividendsPaid;
         owner.transfer(amount < max ? amount : max);
     }
     
@@ -83,7 +83,7 @@ contract ZDice {
         if (number < rollUnder) {
             uint prize = msg.value * 98 / rollUnder;
             msg.sender.transfer(prize);
-            uint divToSub = prize / 2;
+            uint divToSub = (prize - msg.value) / 2;
             dividends = divToSub < dividends ? dividends - divToSub : 0;
             emit Dice(msg.sender, msg.value, prize, number, rollUnder);
         } else {
